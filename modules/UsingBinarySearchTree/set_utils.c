@@ -36,18 +36,6 @@ void update_size(SetNode node) {
     node->size = 1 + (node->left ? node->left->size : 0) + (node->right ? node->right->size : 0);
 }
 
-
-SetNode create_balanced_bst(Vector vec, int start, int end) {
-    if (start > end) return NULL;
-
-    int mid = (start + end) / 2;
-    SetNode node = malloc(sizeof(*node));
-    node->value = vector_get_at(vec, mid);
-    node->left = create_balanced_bst(vec, start, mid - 1);
-    node->right = create_balanced_bst(vec, mid + 1, end);
-    return node;
-}
-
 int partition(Vector vec, int low, int high, CompareFunc compare) {
     Pointer pivot = vector_get_at(vec, high);
     int i = (low - 1);
@@ -82,13 +70,33 @@ void vector_sort(Vector vec, CompareFunc compare) {
 }
 
 
+SetNode create_balanced_bst(Vector vec, int start, int end) {
+    if (start > end) return NULL;
+
+    int mid = (start + end) / 2;
+    SetNode node = malloc(sizeof(*node));
+    if (!node) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    node->value = vector_get_at(vec, mid);
+    node->left = create_balanced_bst(vec, start, mid - 1);
+    node->right = create_balanced_bst(vec, mid + 1, end);
+    node->size = 1 + (node->left ? node->left->size : 0) + (node->right ? node->right->size : 0); // Ensure size is updated correctly
+    printf("Created node with value: %d, size: %d\n", *(int*)node->value, node->size);  // Debug print
+    return node;
+}
+
 Set set_from_vector(Vector vec, CompareFunc compare) {
     int n = vector_size(vec);
-    Vector sorted_vec = vector_create(n, NULL);
+    Vector sorted_vec = vector_create(0, NULL);
 
-    // Copy elements to sorted_vec
+    // Copy unique elements to sorted_vec
     for (int i = 0; i < n; i++) {
-        vector_set_at(sorted_vec, i, vector_get_at(vec, i));
+        Pointer elem = vector_get_at(vec, i);
+        if (vector_find(sorted_vec, elem, compare) == NULL) {
+            vector_insert_last(sorted_vec, elem);
+        }
     }
 
     // Sort the elements
@@ -96,8 +104,12 @@ Set set_from_vector(Vector vec, CompareFunc compare) {
 
     // Create a balanced BST from the sorted elements
     Set set = malloc(sizeof(*set));
-    set->root = create_balanced_bst(sorted_vec, 0, n - 1);
-    set->size = n;
+    if (!set) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    set->root = create_balanced_bst(sorted_vec, 0, vector_size(sorted_vec) - 1);
+    set->size = vector_size(sorted_vec);
     set->compare = compare;
     set->destroy_value = NULL;
 
@@ -105,12 +117,13 @@ Set set_from_vector(Vector vec, CompareFunc compare) {
     return set;
 }
 
-// Helper function for in-order traversal
+
 void inorder_traversal(SetNode node, Vector vec) {
     if (node == NULL)
         return;
 
     inorder_traversal(node->left, vec);
+    printf("Inserting value to vector: %d\n", *(int*)node->value);  // Debug print
     vector_insert_last(vec, node->value);
     inorder_traversal(node->right, vec);
 }
@@ -139,25 +152,39 @@ void set_traverse(Set set, TraverseFunc f) {
 Vector merge_sorted_vectors(Vector vec1, Vector vec2, CompareFunc compare) {
     int n1 = vector_size(vec1);
     int n2 = vector_size(vec2);
-    Vector merged_vec = vector_create(n1 + n2, NULL);
+    Vector merged_vec = vector_create(0, NULL);
 
-    int i = 0, j = 0, k = 0;
+    int i = 0, j = 0;
     while (i < n1 && j < n2) {
         if (compare(vector_get_at(vec1, i), vector_get_at(vec2, j)) <= 0) {
-            vector_set_at(merged_vec, k++, vector_get_at(vec1, i++));
+            if (vector_find(merged_vec, vector_get_at(vec1, i), compare) == NULL) {
+                vector_insert_last(merged_vec, vector_get_at(vec1, i));
+            }
+            i++;
         } else {
-            vector_set_at(merged_vec, k++, vector_get_at(vec2, j++));
+            if (vector_find(merged_vec, vector_get_at(vec2, j), compare) == NULL) {
+                vector_insert_last(merged_vec, vector_get_at(vec2, j));
+            }
+            j++;
         }
     }
     while (i < n1) {
-        vector_set_at(merged_vec, k++, vector_get_at(vec1, i++));
+        if (vector_find(merged_vec, vector_get_at(vec1, i), compare) == NULL) {
+            vector_insert_last(merged_vec, vector_get_at(vec1, i));
+        }
+        i++;
     }
     while (j < n2) {
-        vector_set_at(merged_vec, k++, vector_get_at(vec2, j++));
+        if (vector_find(merged_vec, vector_get_at(vec2, j), compare) == NULL) {
+            vector_insert_last(merged_vec, vector_get_at(vec2, j));
+        }
+        j++;
     }
 
     return merged_vec;
 }
+
+
 
 Set set_merge(Set set1, Set set2, CompareFunc compare) {
     Vector vec1 = set_to_vector(set1);
@@ -173,6 +200,7 @@ Set set_merge(Set set1, Set set2, CompareFunc compare) {
 
     return merged_set;
 }
+
 
 Pointer set_find_k_smallest(Set set, int k) {
     SetNode node = set->root;

@@ -7,61 +7,93 @@
 
 ### Προσωπικά στοιχεία
 
-__Όνομα__: ...
+__Όνομα__: Φοίβος Βλάχος
 
-__Α.Μ.__: sdi???????
+__Α.Μ.__: sdi201900313
 
 ### Ασκήσεις που παραδίδονται
 
 Συμπληρώστε `[x]` στις ασκήσεις (και τυχόν bonus) που παραδίδετε.
 
 - [x] Άσκηση 1
-- [ ] Άσκηση 2
-- [ ] Άσκηση 3
-- [ ] Άσκηση 4
-- [ ] Άσκηση 5
+- [x] Άσκηση 2
+- [x] Άσκηση 3
+- [x] Άσκηση 4
+- [x] Άσκηση 5
 - [ ] Bonus 1
 - [ ] Bonus 2
 
-### Documentation
+# Documentation
 
-## 1) Complexity Analysis (exercise 1) 
+## Γενικές Πληροφορίες
+Αυτό το έργο αφορά την υλοποίηση και δοκιμή γενικών βοηθητικών συναρτήσεων για το Abstract Data Type (ADT) Set. Οι υλοποιήσεις και οι δοκιμές καλύπτουν διάφορες δομές δεδομένων, όπως Binary Search Tree (BST) και BTree.
 
-### set_from_vector
+## Περιγραφή των Αρχείων
 
-- **Time Complexity**: O(n log n)
-    - Inserting each element into the set takes O(log n) time on average.
-    - With n elements, the total time complexity is O(n log n).
+1. **modules/UsingADTSet/set_utils.c**: Περιέχει τις γενικές υλοποιήσεις των βοηθητικών συναρτήσεων για το ADT Set.
+  - `Set set_from_vector(Vector vec, CompareFunc compare)`: Δημιουργεί και επιστρέφει ένα Set που περιέχει όλα τα στοιχεία του Vector vec, με διάταξη compare.
+  - `Vector set_to_vector(Set set)`: Δημιουργεί και επιστρέφει ένα Vector που περιέχει όλα τα στοιχεία του set με τη σειρά διάταξης.
+  - `void set_traverse(Set set, TraverseFunc f)`: Καλεί τη συνάρτηση f(set, value) σε κάθε στοιχείο του set με τη σειρά διάταξης.
+  - `Set set_merge(Set set1, Set set2, CompareFunc compare)`: Δημιουργεί και επιστρέφει ένα set που περιέχει τα στοιχεία και των δύο Sets set1, set2.
+  - `Pointer set_find_k_smallest(Set set, int k)`: Επιστρέφει την k-οστή τιμή του set με τη σειρά διάταξης.
 
-### set_to_vector
+2. **tests/set_utils_test.c**: Περιέχει δοκιμές για τις βοηθητικές συναρτήσεις που υλοποιούνται στο `set_utils.c`.
+  - `test_set_from_vector(void)`: Δοκιμάζει τη συνάρτηση `set_from_vector`.
+  - `test_set_to_vector(void)`: Δοκιμάζει τη συνάρτηση `set_to_vector`.
+  - `test_set_traverse(void)`: Δοκιμάζει τη συνάρτηση `set_traverse`.
+  - `test_set_merge(void)`: Δοκιμάζει τη συνάρτηση `set_merge`.
+  - `test_set_find_k_smallest(void)`: Δοκιμάζει τη συνάρτηση `set_find_k_smallest`.
 
-- **Time Complexity**: O(n)
-    - Traversing the set and inserting elements into the vector takes O(n) time.
+3. **Makefile**: Περιέχει οδηγίες για την κατασκευή και εκτέλεση των δοκιμών.
+  - `make all`: Κατασκευάζει όλα τα εκτελέσιμα αρχεία.
+  - `make run`: Εκτελεί όλες τις δοκιμές.
+  - `make valgrind`: Εκτελεί τις δοκιμές χρησιμοποιώντας το Valgrind για έλεγχο διαρροών μνήμης.
+  - `make clean`: Καθαρίζει τα εκτελέσιμα αρχεία και τα αρχεία αντικειμένων.
 
-## 2) Complexity Analysis (exercise 2)
+## Πολυπλοκότητα Λειτουργιών
 
-### set_from_vector
+- **set_from_vector**: Ο(ν log ν), όπου ν είναι το μέγεθος του vector, λόγω της ανάγκης για ταξινόμηση των στοιχείων και εισαγωγής στο set.
+- **set_to_vector**: Ο(ν), όπου ν είναι το μέγεθος του set, καθώς κάθε στοιχείο επισκέπτεται και εισάγεται σε vector.
+- **set_traverse**: Ο(ν), όπου ν είναι το μέγεθος του set, καθώς κάθε στοιχείο επισκέπτεται μία φορά.
+- **set_merge**: Ο(ν1 + ν2), όπου ν1 και ν2 είναι τα μεγέθη των δύο sets, καθώς κάθε στοιχείο και από τα δύο sets πρέπει να επισκέπτεται και να εισάγεται στο νέο set.
+- **set_find_k_smallest**: Ο(log ν), όπου ν είναι το μέγεθος του set, καθώς απαιτεί αναζήτηση σε ισορροπημένο δέντρο.
 
-- **Time Complexity**: O(n log n)
-    - Inserting each element into the set takes O(log n) time on average.
-    - With n elements, the total time complexity is O(n log n).
+## Οδηγίες Εκτέλεσης
 
-### set_to_vector
+1. **Κατασκευή Εκτελέσιμων Αρχείων**
+   ```sh
+   make all
+   make run 
+   make valgrind
+   make clean
+   
+2. ## Λεπτομέρειες Υλοποίησης
+Η υλοποίηση των βοηθητικών συναρτήσεων του ADT Set έγινε με βάση την αρχή της αφαίρεσης, έτσι ώστε να είναι συμβατές με οποιαδήποτε υποκείμενη δομή δεδομένων του ADT Set. Οι βασικές δομές δεδομένων που χρησιμοποιήθηκαν είναι το Binary Search Tree (BST) και το BTree.
 
-- **Time Complexity**: O(n)
-    - Traversing the set and inserting elements into the vector takes O(n) time.
+### Υλοποίηση `set_from_vector`
+Η συνάρτηση `set_from_vector` παίρνει ως είσοδο ένα Vector και δημιουργεί ένα Set με διάταξη σύμφωνα με τη συνάρτηση σύγκρισης `compare`. Τα βήματα περιλαμβάνουν:
 
-### set_traverse
+1. Αντιγραφή των στοιχείων από το Vector σε ένα νέο Vector.
+2. Ταξινόμηση του νέου Vector.
+3. Δημιουργία ενός ισορροπημένου BST από τα ταξινομημένα στοιχεία.
 
-- **Time Complexity**: O(n)
-    - Traversing the set and applying a function to each element takes O(n) time.
+### Υλοποίηση `set_to_vector`
+Η συνάρτηση `set_to_vector` μετατρέπει ένα Set σε Vector με τη σειρά διάταξης των στοιχείων. Χρησιμοποιεί μια ενδοδιαταγμένη διάσχιση (in-order traversal) για να εισάγει τα στοιχεία στο Vector.
 
-### set_merge
+### Υλοποίηση `set_traverse`
+Η συνάρτηση `set_traverse` επισκέπτεται κάθε στοιχείο του Set με τη σειρά διάταξης και καλεί μια συνάρτηση `TraverseFunc` σε κάθε στοιχείο.
 
-- **Time Complexity**: O((n + m) log(n + m))
-    - Inserting all elements from two sets of sizes n and m into a new set takes O((n + m) log(n + m)) time.
+### Υλοποίηση `set_merge`
+Η συνάρτηση `set_merge` συνδυάζει δύο Sets σε ένα νέο Set. Τα βήματα περιλαμβάνουν:
 
-### set_find_k_smallest
+1. Μετατροπή των δύο Sets σε Vectors.
+2. Συγχώνευση των δύο Vectors σε έναν νέο ταξινομημένο Vector.
+3. Δημιουργία ενός νέου Set από τον ταξινομημένο Vector.
 
-- **Time Complexity**: O(k)
-    - Finding the k-th smallest element requires traversing k elements, taking O(k) time.
+### Υλοποίηση `set_find_k_smallest`
+Η συνάρτηση `set_find_k_smallest` βρίσκει το k-οστό μικρότερο στοιχείο σε ένα Set χρησιμοποιώντας αναζήτηση σε ισορροπημένο δέντρο.
+
+
+
+
+
