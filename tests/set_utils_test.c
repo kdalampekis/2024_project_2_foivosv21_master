@@ -69,12 +69,19 @@ void test_set_to_vector(void) {
 
     printf("Expected size: 3, Actual size: %d\n", vector_size(vec));
     for (int i = 0; i < vector_size(vec); i++) {
-        printf("vec[%d]: %d\n", i, *(int*)vector_get_at(vec, i));
+        int* val = (int*)vector_get_at(vec, i);
+        if (val == NULL) {
+            printf("vec[%d]: NULL\n", i);
+        } else {
+            printf("vec[%d]: %d\n", i, *val);
+        }
     }
     TEST_CHECK(vector_size(vec) == 3);
-    TEST_CHECK(*(int*)vector_get_at(vec, 0) == 1);
-    TEST_CHECK(*(int*)vector_get_at(vec, 1) == 2);
-    TEST_CHECK(*(int*)vector_get_at(vec, 2) == 3);
+    if (vector_size(vec) >= 3) { // Additional safety check
+        TEST_CHECK(*(int*)vector_get_at(vec, 0) == 1);
+        TEST_CHECK(*(int*)vector_get_at(vec, 1) == 2);
+        TEST_CHECK(*(int*)vector_get_at(vec, 2) == 3);
+    }
 
     vector_destroy(vec); // Ensure vector is destroyed
     set_destroy(set); // Ensure set is destroyed
@@ -124,13 +131,20 @@ void test_set_merge(void) {
 
     printf("Expected size: 4, Actual size: %d\n", vector_size(vec));
     for (int i = 0; i < vector_size(vec); i++) {
-        printf("vec[%d]: %d\n", i, *(int*)vector_get_at(vec, i));
+        int* val = (int*)vector_get_at(vec, i);
+        if (val == NULL) {
+            printf("vec[%d]: NULL\n", i);
+        } else {
+            printf("vec[%d]: %d\n", i, *val);
+        }
     }
     TEST_CHECK(vector_size(vec) == 4);
-    TEST_CHECK(*(int*)vector_get_at(vec, 0) == 1);
-    TEST_CHECK(*(int*)vector_get_at(vec, 1) == 2);
-    TEST_CHECK(*(int*)vector_get_at(vec, 2) == 3);
-    TEST_CHECK(*(int*)vector_get_at(vec, 3) == 4);
+    if (vector_size(vec) >= 4) { // Additional safety check
+        TEST_CHECK(*(int*)vector_get_at(vec, 0) == 1);
+        TEST_CHECK(*(int*)vector_get_at(vec, 1) == 2);
+        TEST_CHECK(*(int*)vector_get_at(vec, 2) == 3);
+        TEST_CHECK(*(int*)vector_get_at(vec, 3) == 4);
+    }
 
     vector_destroy(vec);
     set_destroy(set1);

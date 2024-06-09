@@ -1,4 +1,4 @@
-    ///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 //
 // Υλοποίηση του set_utils με γενικό τρόπο, χρησιμοποιώντας
 // μια οποιαδήποτε υλοποίηση του ADT Set.
@@ -10,20 +10,18 @@
 #include "../../include/ADTVector.h"
 #include "../../include/set_utils.h"
 
-
 Set set_from_vector(Vector vec, CompareFunc compare) {
     Set set = set_create(compare, NULL);
     for (int i = 0; i < vector_size(vec); i++) {
-            set_insert(set, vector_get_at(vec, i));
+        set_insert(set, vector_get_at(vec, i));
     }
     return set;
 }
 
 Vector set_to_vector(Set set) {
-    Vector vec = vector_create(set_size(set), NULL);
-    int i = 0;
+    Vector vec = vector_create(0, NULL);  // Create with initial size 0 to allow dynamic growth
     for (SetNode node = set_first(set); node != SET_EOF; node = set_next(set, node)) {
-        vector_set_at(vec, i++, set_node_value(set, node));
+        vector_insert_last(vec, set_node_value(set, node));  // Insert elements at the end
     }
     return vec;
 }

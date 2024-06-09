@@ -6,10 +6,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "../../include/set_utils.h"
 #include "../../include/ADTVector.h"
-
 
 // Χρησιμοποιούμε τη συγκεκριμένη υλοποίηση του UsingBinarySearchTree/ADTSet.c,
 // οπότε γνωρίζουμε την ακριβή δομή για την αναπαράσταση των δεδομένων.
@@ -17,23 +15,25 @@
 // τα περιεχόμενά τους.
 
 struct set {
-	SetNode root;				// η ρίζα, NULL αν είναι κενό δέντρο
-	int size;					// μέγεθος, ώστε η set_size να είναι Ο(1)
-	CompareFunc compare;		// η διάταξη
-	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο του set
+    SetNode root;				// η ρίζα, NULL αν είναι κενό δέντρο
+    int size;					// μέγεθος, ώστε η set_size να είναι Ο(1)
+    CompareFunc compare;		// η διάταξη
+    DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο του set
 };
 
 struct set_node {
-	SetNode left, right;		// Παιδιά
-	Pointer value;
+    SetNode left, right;		// Παιδιά
+    Pointer value;
     int size; // New field to track the size of the subtree
-
 };
 
 // Helper function to update the size of a node
 void update_size(SetNode node) {
     if (node == NULL) return;
-    node->size = 1 + (node->left ? node->left->size : 0) + (node->right ? node->right->size : 0);
+    int left_size = node->left ? node->left->size : 0;
+    int right_size = node->right ? node->right->size : 0;
+    node->size = 1 + left_size + right_size;
+    printf("Updating node size: %d (left_size: %d, right_size: %d)\n", node->size, left_size, right_size); // Debug print
 }
 
 int partition(Vector vec, int low, int high, CompareFunc compare) {
@@ -62,13 +62,11 @@ void quicksort(Vector vec, int low, int high, CompareFunc compare) {
     }
 }
 
-
 void vector_sort(Vector vec, CompareFunc compare) {
     if (vector_size(vec) > 0) {
         quicksort(vec, 0, vector_size(vec) - 1, compare);
     }
 }
-
 
 SetNode create_balanced_bst(Vector vec, int start, int end) {
     if (start > end) return NULL;
@@ -82,10 +80,11 @@ SetNode create_balanced_bst(Vector vec, int start, int end) {
     node->value = vector_get_at(vec, mid);
     node->left = create_balanced_bst(vec, start, mid - 1);
     node->right = create_balanced_bst(vec, mid + 1, end);
-    node->size = 1 + (node->left ? node->left->size : 0) + (node->right ? node->right->size : 0); // Ensure size is updated correctly
+    update_size(node);
     printf("Created node with value: %d, size: %d\n", *(int*)node->value, node->size);  // Debug print
     return node;
 }
+
 
 Set set_from_vector(Vector vec, CompareFunc compare) {
     int n = vector_size(vec);
@@ -117,22 +116,23 @@ Set set_from_vector(Vector vec, CompareFunc compare) {
     return set;
 }
 
-
 void inorder_traversal(SetNode node, Vector vec) {
     if (node == NULL)
         return;
 
     inorder_traversal(node->left, vec);
-    printf("Inserting value to vector: %d\n", *(int*)node->value);  // Debug print
+    printf("Inserting value to vector: %d (Node size: %d)\n", *(int*)node->value, node->size);  // Debug print
     vector_insert_last(vec, node->value);
     inorder_traversal(node->right, vec);
 }
 
 Vector set_to_vector(Set set) {
-    Vector vec = vector_create(set->size, NULL);
+    Vector vec = vector_create(set->size, NULL); // Initialize with set size
     inorder_traversal(set->root, vec);
     return vec;
 }
+
+
 
 // Helper function for in-order traversal
 void inorder_traverse(SetNode node, Set set, TraverseFunc f) {
@@ -184,8 +184,6 @@ Vector merge_sorted_vectors(Vector vec1, Vector vec2, CompareFunc compare) {
     return merged_vec;
 }
 
-
-
 Set set_merge(Set set1, Set set2, CompareFunc compare) {
     Vector vec1 = set_to_vector(set1);
     Vector vec2 = set_to_vector(set2);
@@ -200,7 +198,6 @@ Set set_merge(Set set1, Set set2, CompareFunc compare) {
 
     return merged_set;
 }
-
 
 Pointer set_find_k_smallest(Set set, int k) {
     SetNode node = set->root;
